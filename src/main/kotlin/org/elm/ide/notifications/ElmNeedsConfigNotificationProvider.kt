@@ -12,6 +12,7 @@ import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.ui.EditorNotificationPanel
 import com.intellij.ui.EditorNotifications
+import com.intellij.serviceContainer.AlreadyDisposedException
 import org.elm.lang.core.psi.isElmFile
 import org.elm.openapiext.findFileByPath
 import org.elm.workspace.*
@@ -111,9 +112,9 @@ class ElmNeedsConfigNotificationProvider(
                 versionCheck = VersionCheck.Checked(v)
             }
             // refresh the UI
-            ApplicationManager.getApplication().invokeLater {
+            ApplicationManager.getApplication().invokeLater({
                 notifications.updateAllNotifications()
-            }
+            }, { project.isDisposed })
         }
     }
 
