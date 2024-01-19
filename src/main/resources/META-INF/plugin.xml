@@ -36,6 +36,17 @@
 
     <change-notes><![CDATA[
         <ul>
+            <li><b>4.4.2</b> <em>(2024-01-19)</em>
+                <ul>
+                    <li>Upgrade to Gradle 6.7</li>
+                    <li>Upgrade plugin dependency org.jetbrains.intellij to version 0.6.3</li>
+                    <li>Upgrade plugin dependency org.jetbrains:markdown to version 0.1.46</li>
+                    <li>Upgrade plugin dependency com.github.ajalt:colormath to version 1.4.1</li>
+                    <li>Fix bug and unit test with decimal separator when default locale use comma instead of point during color translation</li>
+                    <li>Fix bug and unit test with end of line separator on windows during multi line intention</li>
+                    <li>Fix IntelliJ plugin error "The default implementation of method 'getId' is deprecated, you need to override it in 'class org.elm.ide.test.run.ElmTestConfigurationFactory'."</li>
+                </ul>
+            </li>
             <li><b>4.4.1</b> <em>(2021-09-20)</em>
                 <ul>
                     <li>Enable support for all newer versions of IntelliJ (future versions introduce incompatibilities)</li>
