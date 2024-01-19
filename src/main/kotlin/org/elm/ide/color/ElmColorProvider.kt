@@ -12,6 +12,7 @@ import org.elm.lang.core.psi.ElmTypes.REGULAR_STRING_PART
 import org.elm.lang.core.psi.elementType
 import org.elm.lang.core.psi.elements.*
 import java.awt.Color
+import java.util.*
 import kotlin.math.roundToInt
 
 private val colorRegex = Regex("""#[0-9a-fA-F]{3,8}\b|\b(?:rgb|hsl)a?\([^)]+\)""")
@@ -199,5 +200,64 @@ private fun Color.toRGB() = RGB(red, green, blue, alpha / 255f)
 private fun Float.render(): String = when (this) {
     0f -> "0"
     1f -> "1"
-    else -> String.format("%.4f", this).trimEnd('0').trimEnd('.')
+    else -> String.format(Locale.US, "%.4f", this).trimEnd('0').trimEnd('.')
+}
+
+//TODO REMOVE ME
+//Copy-paste code from thirdparty com.github.ajalt.colormath:colormath:1.4.0 to fix render function until upgrade to Kotlin 1.4 is possible
+private fun Float.renderCss(percent: Boolean = false): String = when (percent) {
+    true -> "${(this * 100).roundToInt()}%"
+    false -> when (this) {
+        0f -> "0"
+        1f -> "1"
+        else -> String.format(Locale.US, "%.4f", this).trim('0').trimEnd('0').trimEnd('.')
+    }
+}
+fun ConvertibleColor.toCssRgb(
+        commas: Boolean = true,
+        namedRgba: Boolean = false,
+        rgbPercent: Boolean = false,
+        alphaPercent: Boolean = false,
+        renderAlpha: RenderCondition = RenderCondition.AUTO
+): String {
+    val (r, g, b, a) = toRGB()
+    val sep = if (commas) ", " else " "
+    val args = listOf(r, g, b).joinToString(sep) {
+        when (rgbPercent) {
+            true -> it.div(255f).renderCss(percent = true)
+            false -> it.toString()
+        }
+    }.withAlpha(a, commas, renderAlpha, alphaPercent)
+    val name = if (namedRgba) "rgba" else "rgb"
+    return "$name($args)"
+}
+
+fun ConvertibleColor.toCssHsl(
+        commas: Boolean = true,
+        namedHsla: Boolean = false,
+        hueUnit: AngleUnit = AngleUnit.AUTO,
+        alphaPercent: Boolean = false,
+        renderAlpha: RenderCondition = RenderCondition.AUTO
+): String {
+    val hsl = toHSL()
+    val (h, s, l, a) = hsl
+    val sep = if (commas) ", " else " "
+    val hue = when (hueUnit) {
+        AngleUnit.AUTO -> "$h"
+        AngleUnit.DEGREES -> "${h}deg"
+        AngleUnit.RADIANS -> "${hsl.hueAsRad().renderCss()}rad"
+        AngleUnit.GRADIANS -> "${hsl.hueAsGrad().renderCss()}grad"
+        AngleUnit.TURNS -> "${hsl.hueAsTurns().renderCss()}turn"
+    }
+
+    val args = listOf(hue, (s / 100f).renderCss(true), (l / 100f).renderCss(true)).joinToString(sep)
+            .withAlpha(a, commas, renderAlpha, alphaPercent)
+    val name = if (namedHsla) "hsla" else "hsl"
+    return "$name($args)"
+}
+private fun String.withAlpha(a: Float, commas: Boolean, renderAlpha: RenderCondition, alphaPercent: Boolean) = when {
+    renderAlpha == RenderCondition.ALWAYS || renderAlpha == RenderCondition.AUTO && a != 1f -> {
+        this + (if (commas) ", " else " / ") + a.renderCss(alphaPercent)
+    }
+    else -> this
 }
