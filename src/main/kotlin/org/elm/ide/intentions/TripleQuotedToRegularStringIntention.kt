@@ -30,7 +30,7 @@ class TripleQuotedToRegularStringIntention : StringDelimiterIntention(REGULAR_ST
         return source
             .unescapeLastDoubleQuote()
             // Replace line separators with "\n" as they need to be escaped in regular strings
-            .replace(System.lineSeparator(), SLASH_N)
+            .replace("\n", SLASH_N)
             // Escape double-quotes.
             .replace(DOUBLE_QUOTE, ESCAPED_DOUBLE_QUOTE)
     }

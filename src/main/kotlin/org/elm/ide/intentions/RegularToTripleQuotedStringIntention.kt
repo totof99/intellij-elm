@@ -26,7 +26,7 @@ class RegularToTripleQuotedStringIntention : StringDelimiterIntention(TRIPLE_QUO
     override fun getReplacement(source: String): String {
         val replacement = source
             // Replace \n with an actual line separator as they don't need to be escaped in triple-quoted strings.
-            .replace(SLASH_N, System.lineSeparator())
+            .replace(SLASH_N, "\n")
             // Replace \" with double-quotes without the backslash as they don't need to be escaped either.
             .replace(ESCAPED_DOUBLE_QUOTE, DOUBLE_QUOTE)
 

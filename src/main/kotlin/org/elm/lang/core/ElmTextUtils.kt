@@ -87,14 +87,14 @@ private fun unwrapNestedParensHelp(expression: ElmParenthesizedExpr): ElmParenth
 class IndentedTextBuilder(startLevel: Int, val indentSize: Int) {
     var level: Int = startLevel
     private var buffer = StringBuilder()
-
     fun appendLine(str: String = "") {
         if (str.isBlank()) {
-            buffer.appendln()
+            buffer.append("\n")
             return
         }
         buffer.append(" ".repeat(level * indentSize))
-        buffer.appendln(str)
+        buffer.append(str)
+        buffer.append("\n")
     }
 
     fun build() = buffer.toString()
