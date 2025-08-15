@@ -13,7 +13,7 @@ buildscript {
 }
 
 plugins {
-    id "org.jetbrains.intellij" version "0.6.3"
+    id "org.jetbrains.intellij" version "0.7.3"
     id "org.jetbrains.grammarkit" version "2019.1"
 }
 
@@ -23,6 +23,7 @@ repositories {
     maven {
         url "http://repository.jetbrains.com/all"
     }
+    maven { url 'https://packages.jetbrains.team/maven/p/ij/intellij-dependencies' }
     maven {
         url "https://dl.bintray.com/kotlin/kotlin-dev"
     }
