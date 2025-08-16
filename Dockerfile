@@ -1,6 +1,6 @@
 FROM ubuntu:jammy AS build
 WORKDIR /build
-RUN apt update -y && apt install -y --no-install-recommends git openjdk-8-jdk vim && rm -rf /var/lib/apt/lists/*
+RUN apt update -y && apt install -y --no-install-recommends git openjdk-17-jdk vim && rm -rf /var/lib/apt/lists/*
 COPY . /build/intellij-elm
 
 FROM build AS build_exec

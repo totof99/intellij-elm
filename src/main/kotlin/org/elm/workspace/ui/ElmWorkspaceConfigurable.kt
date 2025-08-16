@@ -33,6 +33,10 @@ class ElmWorkspaceConfigurable(
         private val project: Project
 ) : Configurable, Disposable {
 
+    init {
+        Disposer.register(project, this)
+    }
+
     private val uiDebouncer = UiDebouncer(this)
 
     private fun toolPathTextField(programName: String): TextFieldWithBrowseButton {
@@ -82,7 +86,7 @@ class ElmWorkspaceConfigurable(
         }
 
         // Whenever this panel appears, refresh just in case the user made changes on the Keymap settings screen.
-        UiNotifyConnector(panel, object : Activatable.Adapter() {
+        UiNotifyConnector(panel, object : Activatable {
             override fun showNotify() = update()
         }).also { Disposer.register(this, it) }
 
@@ -204,7 +208,7 @@ class ElmWorkspaceConfigurable(
             shortcuts.isEmpty() -> "No Shortcut"
             else -> shortcuts.joinToString(", ") { KeymapUtil.getShortcutText(it) }
         }
-        elmFormatShortcutLabel.setHyperlinkText(shortcutStatus + " ", "Change", "")
+        elmFormatShortcutLabel.setTextWithHyperlink(shortcutStatus + "{} <hyperlink>Change</hyperlink>")
     }
 
     override fun dispose() {

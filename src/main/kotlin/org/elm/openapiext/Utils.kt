@@ -102,7 +102,7 @@ fun Editor.toPsiFile(project: Project): PsiFile? =
         PsiDocumentManager.getInstance(project).getPsiFile(document)
 
 
-inline fun <Key, reified Psi : PsiElement> getElements(
+inline fun <Key : Any, reified Psi : PsiElement> getElements(
         indexKey: StubIndexKey<Key, Psi>,
         key: Key, project: Project,
         scope: GlobalSearchScope?
