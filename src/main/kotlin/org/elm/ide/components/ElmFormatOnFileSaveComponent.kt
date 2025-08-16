@@ -1,22 +1,17 @@
 package org.elm.ide.components
 
 import com.intellij.AppTopics
-import com.intellij.ide.DataManager
 import com.intellij.notification.NotificationType
-import com.intellij.openapi.actionSystem.ActionManager
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.ProjectComponent
 import com.intellij.openapi.editor.Document
-import com.intellij.openapi.editor.EditorFactory
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.FileDocumentManagerListener
 import com.intellij.openapi.project.Project
-import org.elm.ide.notifications.executeAction
 import org.elm.ide.notifications.showBalloon
 import org.elm.lang.core.psi.isElmFile
 import org.elm.workspace.commandLineTools.ElmFormatCLI
 import org.elm.workspace.commandLineTools.ElmFormatCLI.ElmFormatResult
-import org.elm.workspace.compiler.ELM_BUILD_ACTION_ID
 import org.elm.workspace.elmSettings
 import org.elm.workspace.elmToolchain
 import org.elm.workspace.elmWorkspace

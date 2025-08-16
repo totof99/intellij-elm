@@ -32,7 +32,7 @@ class ElmColorProvider : ElementColorProvider {
     private fun getCssColorFromString(element: PsiElement): Color? {
         if (element.elementType != REGULAR_STRING_PART) return null
         return colorRegex.find(element.text)
-                ?.let { runCatching { ConvertibleColor.fromCss(it.value) }.getOrNull() }
+                ?.let { runCatching { com.github.ajalt.colormath.Color.fromCss(it.value) }.getOrNull() }
                 ?.toAwtColor()
     }
 
@@ -191,7 +191,7 @@ private data class FuncCall(
         }
 }
 
-fun ConvertibleColor.toAwtColor(): Color = toRGB().let {
+fun com.github.ajalt.colormath.Color.toAwtColor(): Color = toRGB().let {
     Color(it.r, it.g, it.b, (it.a * 255).roundToInt())
 }
 
@@ -213,7 +213,7 @@ private fun Float.renderCss(percent: Boolean = false): String = when (percent) {
         else -> String.format(Locale.US, "%.4f", this).trim('0').trimEnd('0').trimEnd('.')
     }
 }
-fun ConvertibleColor.toCssRgb(
+fun com.github.ajalt.colormath.Color.toCssRgb(
         commas: Boolean = true,
         namedRgba: Boolean = false,
         rgbPercent: Boolean = false,
@@ -232,7 +232,7 @@ fun ConvertibleColor.toCssRgb(
     return "$name($args)"
 }
 
-fun ConvertibleColor.toCssHsl(
+fun com.github.ajalt.colormath.Color.toCssHsl(
         commas: Boolean = true,
         namedHsla: Boolean = false,
         hueUnit: AngleUnit = AngleUnit.AUTO,
