@@ -36,6 +36,17 @@
 
     <change-notes><![CDATA[
         <ul>
+            <li><b>4.4.3</b> <em>(2025-08-16)</em>
+                <ul>
+                    <li>Upgrade `Gradle Wrapper` to version `8.5`</li>
+                    <li>Upgrade `OpenJDK` to version `17`</li>
+                    <li>Upgrade plugin dependency `org.jetbrains.intellij` to version `1.16.1`</li>
+                    <li>Upgrade plugin dependency `org.jetbrains.kotlin.jvm` to version `1.9.21`</li>
+                    <li>Upgrade plugin dependency `org.jetbrains.grammarkit` to version `2022.3.2.1`</li>
+                    <li>Upgrade plugin dependency `com.github.ajalt.colormath` to version `2.1.0`</li>
+                    <li>Add Dockerfile to build</li>
+                </ul>
+            </li>
             <li><b>4.4.2</b> <em>(2024-01-19)</em>
                 <ul>
                     <li>Upgrade to Gradle 6.7</li>
