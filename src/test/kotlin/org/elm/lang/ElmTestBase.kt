@@ -38,7 +38,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReference
 import com.intellij.psi.impl.PsiManagerEx
 import com.intellij.testFramework.LightProjectDescriptor
-import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixtureTestCase
+import com.intellij.testFramework.fixtures.BasePlatformTestCase
 import junit.framework.AssertionFailedError
 import org.elm.FileTree
 import org.elm.TestProject
@@ -50,6 +50,7 @@ import org.elm.workspace.EmptyElmStdlibVariant
 import org.elm.workspace.MinimalElmStdlibVariant
 import org.elm.workspace.elmWorkspace
 import org.intellij.lang.annotations.Language
+import java.io.InputStreamReader
 import java.util.*
 
 /**
@@ -67,7 +68,7 @@ import java.util.*
  *
  * For "heavier" integration tests, see [org.elm.workspace.ElmWorkspaceTestBase]
  */
-abstract class ElmTestBase : LightPlatformCodeInsightFixtureTestCase(), ElmTestCase {
+abstract class ElmTestBase : BasePlatformTestCase(), ElmTestCase {
 
     override fun getProjectDescriptor(): LightProjectDescriptor = ElmDefaultDescriptor
 
@@ -232,7 +233,7 @@ abstract class ElmTestBase : LightPlatformCodeInsightFixtureTestCase(), ElmTestC
             val stream = ElmTestBase::class.java.classLoader.getResourceAsStream(path)
                     ?: return null
 
-            return StreamUtil.readText(stream, Charsets.UTF_8)
+            return StreamUtil.readText(InputStreamReader(stream, Charsets.UTF_8))
         }
     }
 

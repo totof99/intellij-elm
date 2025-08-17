@@ -45,7 +45,6 @@ abstract class ElmWorkspaceTestBase : CodeInsightFixtureTestCase<ModuleFixtureBu
         project.elmWorkspace.useToolchain(toolchain)
     }
 
-
     override fun runTestRunnable(testRunnable: ThrowableRunnable<Throwable>) {
         if (!toolchain.looksLikeValidToolchain()) {
             fail("no Elm toolchain found")
@@ -53,7 +52,6 @@ abstract class ElmWorkspaceTestBase : CodeInsightFixtureTestCase<ModuleFixtureBu
         }
         super.runTestRunnable(testRunnable)
     }
-
 
     override fun tearDown() {
         project.elmWorkspace.useToolchain(originalToolchain)

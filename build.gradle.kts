@@ -6,17 +6,17 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 fun properties(key: String) = providers.gradleProperty(key)
 fun environment(key: String) = providers.environmentVariable(key)
 
-//Based on https://github.com/JetBrains/intellij-platform-plugin-template/tree/v1.11.3
+//Based on https://github.com/JetBrains/intellij-platform-plugin-template/tree/v1.14.2
 
 plugins {
     // Java support
     id("java")
     // Kotlin support
-    id("org.jetbrains.kotlin.jvm") version "1.9.21"
+    id("org.jetbrains.kotlin.jvm") version "1.9.25"
     // Gradle IntelliJ Plugin
-    id("org.jetbrains.intellij") version "1.16.1"
+    id("org.jetbrains.intellij") version "1.17.4"
     // GrammarKit Plugin
-    id("org.jetbrains.grammarkit") version "2022.3.2.1"
+    id("org.jetbrains.grammarkit") version "2022.3.2.2"
 }
 
 group = properties("pluginGroup").get()
@@ -30,7 +30,7 @@ repositories {
 dependencies {
     implementation("com.github.ajalt.colormath:colormath:2.1.0")
 
-    testImplementation("org.jetbrains.kotlin:kotlin-test:1.9.21")
+    testImplementation("org.jetbrains.kotlin:kotlin-test:1.9.25")
 }
 
 // Configure IntelliJ Platform Gradle Plugin - read more: https://plugins.jetbrains.com/docs/intellij/tools-gradle-intellij-plugin.html
@@ -43,18 +43,17 @@ intellij {
 
 //Gradle Grammar-Kit Plugin - read more: https://github.com/JetBrains/gradle-grammar-kit-plugin
 val generateSpecParser = tasks.create<GenerateParserTask>("generateElmParser") {
-    sourceFile.set(file("$projectDir/src/main/grammars/ElmParser.bnf"))
-    targetRoot.set("$projectDir/src/main/gen")
+    sourceFile = file("$projectDir/src/main/grammars/ElmParser.bnf")
+    targetRootOutputDir = file("$projectDir/src/main/gen")
     pathToParser.set("/org/elm/lang/core/parser/ElmParser.java")
     pathToPsiRoot.set("/org/elm/lang/core/psi")
     purgeOldFiles.set(true)
 }
 
 val generateSpecLexer = tasks.create<GenerateLexerTask>("generateElmLexer") {
-    sourceFile.set(file("$projectDir/src/main/grammars/ElmLexer.flex"))
-    skeleton.set(file("$projectDir/src/main/grammars/lexer.skeleton"))
-    targetDir.set("$projectDir/src/main/gen/org/elm/lang/core/lexer/")
-    targetClass.set("_ElmLexer")
+    sourceFile = file("$projectDir/src/main/grammars/ElmLexer.flex")
+    skeleton = file("$projectDir/src/main/grammars/lexer.skeleton")
+    targetOutputDir = file("$projectDir/src/main/gen/org/elm/lang/core/lexer/")
     purgeOldFiles.set(true)
 }
 

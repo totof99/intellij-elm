@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeType
 import com.intellij.openapi.util.SystemInfo
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.openapi.vfs.LocalFileSystem
-import com.intellij.util.io.exists
+import kotlin.io.path.exists
 import org.elm.openapiext.refreshAndFindFileByPathTestAware
 import org.elm.workspace.ElmToolchain.Companion.SIDECAR_FILENAME
 import org.elm.workspace.solver.Pkg

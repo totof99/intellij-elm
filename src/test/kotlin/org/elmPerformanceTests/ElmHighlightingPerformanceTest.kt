@@ -90,5 +90,5 @@ class ElmHighlightingPerformanceTest : ElmRealProjectTestBase() {
     }
 
     private fun currentPsiModificationCount() =
-            PsiModificationTracker.getInstance(project).modificationCount
+        PsiModificationTracker.getInstance(project).modificationCount
 }

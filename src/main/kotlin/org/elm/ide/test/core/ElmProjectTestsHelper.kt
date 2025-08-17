@@ -1,7 +1,7 @@
 package org.elm.ide.test.core
 
 import com.intellij.openapi.project.Project
-import com.intellij.util.io.exists
+import kotlin.io.path.exists
 import org.elm.workspace.ElmProject
 import org.elm.workspace.elmWorkspace
 

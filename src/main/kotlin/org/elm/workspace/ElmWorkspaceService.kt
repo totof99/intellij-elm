@@ -28,7 +28,7 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.psi.impl.source.resolve.ResolveCache
 import com.intellij.util.Consumer
-import com.intellij.util.io.exists
+import kotlin.io.path.exists
 import com.intellij.util.io.systemIndependentPath
 import com.intellij.util.messages.Topic
 import org.elm.lang.core.psi.modificationTracker
