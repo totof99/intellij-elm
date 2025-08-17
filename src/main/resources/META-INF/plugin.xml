@@ -36,6 +36,15 @@
 
     <change-notes><![CDATA[
         <ul>
+            <li><b>4.4.4</b> <em>(2025-08-17)</em>
+                <ul>
+                    <li>Upgrade plugin dependency `org.jetbrains.kotlin.jvm` to version `1.9.25`</li>
+                    <li>Upgrade plugin dependency `org.jetbrains.kotlin:kotlin-test` to version `1.9.25`</li>
+                    <li>Upgrade plugin dependency `org.jetbrains.intellij` to version `1.17.4`</li>
+                    <li>Upgrade plugin dependency `org.jetbrains.grammarkit` to version `2022.3.2.2`</li>
+                    <li>Upgrade plugin dependency `com.github.ajalt.colormath` to version `3.5.0`</li>
+                </ul>
+            </li>
             <li><b>4.4.3</b> <em>(2025-08-16)</em>
                 <ul>
                     <li>Upgrade `Gradle Wrapper` to version `8.5`</li>
