@@ -26,22 +26,18 @@ SOFTWARE.
 
 package org.elm.lang
 
-import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.editor.LogicalPosition
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.roots.ContentEntry
 import com.intellij.openapi.roots.ModifiableRootModel
 import com.intellij.openapi.util.io.StreamUtil
-import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VfsUtil
-import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.vfs.VirtualFileFilter
 import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiReference
 import com.intellij.psi.impl.PsiManagerEx
 import com.intellij.testFramework.LightProjectDescriptor
-import com.intellij.testFramework.PlatformTestUtil
 import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixtureTestCase
 import junit.framework.AssertionFailedError
 import org.elm.FileTree
@@ -54,8 +50,7 @@ import org.elm.workspace.EmptyElmStdlibVariant
 import org.elm.workspace.MinimalElmStdlibVariant
 import org.elm.workspace.elmWorkspace
 import org.intellij.lang.annotations.Language
-
-private val log = logger<ElmTestBase>()
+import java.util.*
 
 /**
  * Base class for basically all Elm tests *except* lexing, parsing and stuff that depends
@@ -82,17 +77,6 @@ abstract class ElmTestBase : LightPlatformCodeInsightFixtureTestCase(), ElmTestC
 
     override fun getTestDataPath(): String = "${ElmTestCase.testResourcesPath}/$dataPath"
 
-    override fun runTest() {
-        val projectDescriptor = projectDescriptor
-        val reason = (projectDescriptor as? ElmProjectDescriptorBase)?.skipTestReason
-        if (reason != null) {
-            System.err.println("SKIP $name: $reason")
-            return
-        }
-
-        super.runTest()
-    }
-
     protected val fileName: String
         get() = "$testName.elm"
 
@@ -106,25 +90,13 @@ abstract class ElmTestBase : LightPlatformCodeInsightFixtureTestCase(), ElmTestC
         myFixture.checkResultByFile(after, ignoreTrailingWhitespace)
     }
 
-    protected fun checkByDirectory(action: () -> Unit) {
-        val (before, after) = ("$testName/before" to "$testName/after")
-
-        val targetPath = ""
-        val beforeDir = myFixture.copyDirectoryToProject(before, targetPath)
-
-        action()
-
-        val afterDir = getVirtualFileByName("$testDataPath/$after")
-        PlatformTestUtil.assertDirectoriesEqual(afterDir, beforeDir)
-    }
-
     protected fun checkByDirectory(@Language("Elm") before: String, @Language("Elm") after: String, action: () -> Unit) {
         fileTreeFromText(before).create()
         action()
         FileDocumentManager.getInstance().saveAllDocuments()
         fileTreeFromText(after).assertEquals(myFixture.findFileInTempDir("."))
     }
-
+    
     protected fun checkByText(
             @Language("Elm") before: String,
             @Language("Elm") after: String,
@@ -133,24 +105,6 @@ abstract class ElmTestBase : LightPlatformCodeInsightFixtureTestCase(), ElmTestC
         InlineFile(before)
         action()
         myFixture.checkResult(replaceCaretMarker(after))
-    }
-
-    protected fun openFileInEditor(path: String) {
-        myFixture.configureFromExistingVirtualFile(myFixture.findFileInTempDir(path))
-    }
-
-    protected fun getVirtualFileByName(path: String): VirtualFile? =
-            LocalFileSystem.getInstance().findFileByPath(path)
-
-    protected inline fun <reified X : Throwable> expect(f: () -> Unit) {
-        try {
-            f()
-        } catch (e: Throwable) {
-            if (e is X)
-                return
-            throw e
-        }
-        fail("No ${X::class.java} was thrown during the test")
     }
 
     inner class InlineFile(@Language("Elm") private val code: String, val name: String = "main.elm") {
@@ -219,13 +173,9 @@ abstract class ElmTestBase : LightPlatformCodeInsightFixtureTestCase(), ElmTestC
     }
 
     protected open class ElmProjectDescriptorBase(val enableStdlib: Boolean) : LightProjectDescriptor() {
-        open val skipTestReason: String? = null
 
         override fun configureModule(module: Module, model: ModifiableRootModel, contentEntry: ContentEntry) {
             super.configureModule(module, model, contentEntry)
-
-            if (skipTestReason != null)
-                return
 
             val toolchain = ElmToolchain.suggest(module.project)
             require(toolchain.looksLikeValidToolchain()) { "failed to find Elm toolchain: cannot setup workspace for tests" }
@@ -264,9 +214,7 @@ abstract class ElmTestBase : LightPlatformCodeInsightFixtureTestCase(), ElmTestC
         fun camelOrWordsToSnake(name: String): String {
             if (' ' in name) return name.replace(" ", "_")
 
-            return name.split("(?=[A-Z])".toRegex())
-                    .map(String::toLowerCase)
-                    .joinToString("_")
+            return name.split("(?=[A-Z])".toRegex()).joinToString("_") { it.lowercase(Locale.US) }
         }
 
         @JvmStatic

@@ -39,7 +39,7 @@ class UiDebouncer(
                 if (!Disposer.isDisposed(parentDisposable)) {
                     onUiThread(r)
                 }
-            }, ModalityState.any())
+            }, { Disposer.isDisposed(parentDisposable) })
         }, delayMillis)
     }
 }

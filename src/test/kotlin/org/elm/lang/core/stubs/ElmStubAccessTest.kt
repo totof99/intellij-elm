@@ -35,6 +35,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.impl.source.PsiFileImpl
 import com.intellij.psi.stubs.StubElement
 import com.intellij.testFramework.LoggedErrorProcessor
+import com.intellij.util.ThrowableRunnable
 import org.apache.log4j.Logger
 import org.elm.lang.ElmTestBase
 import org.elm.lang.core.psi.ElmNamedElement
@@ -70,26 +71,26 @@ class ElmStubAccessTest : ElmTestBase() {
 
     fun `test parent works correctly for stubbed elements`() {
         val parentsByStub: MutableMap<PsiElement, PsiElement> = HashMap()
-        try {
-            LoggedErrorProcessor.setNewInstance(object : LoggedErrorProcessor() {
-                override fun processError(message: String?, t: Throwable?, details: Array<out String>?, logger: Logger) {
-                    logger.info(message, t)
-                    throw AssertionError(message)
+        LoggedErrorProcessor.executeWith(
+            object : LoggedErrorProcessor() {
+                override fun processError(category: String, message: String, details: Array<String>, t: Throwable?): Set<Action> {
+                    println(message)
+                    throw AssertionError(message, t)
                 }
-            })
-            processStubsWithoutAstAccess<ElmPsiElement> {
-                val parent = try {
-                    it.parent
-                } catch (e: AssertionError) {
-                    null
-                }
-                if (parent != null) {
-                    parentsByStub += it to it.parent
+            },
+            ThrowableRunnable<AssertionError> {
+                processStubsWithoutAstAccess<ElmPsiElement> {
+                    val parent = try {
+                        it.parent
+                    } catch (e: AssertionError) {
+                        null
+                    }
+                    if (parent != null) {
+                        parentsByStub += it to it.parent
+                    }
                 }
             }
-        } finally {
-            LoggedErrorProcessor.restoreDefaultProcessor()
-        }
+        )
 
         checkAstNotLoaded(VirtualFileFilter.NONE)
 

@@ -69,17 +69,17 @@ class ElmWorkspacePanel(private val project: Project) : SimpleToolWindowPanel(tr
         setContent(ScrollPaneFactory.createScrollPane(projectListUI, 0))
 
         // populate the initial workspace state
-        ApplicationManager.getApplication().invokeLater {
+        ApplicationManager.getApplication().invokeLater({
             elmProjects = project.elmWorkspace.allProjects
-        }
+        }, { project.isDisposed })
 
         // observe changes to the workspace
         with(project.messageBus.connect()) {
             subscribe(ElmWorkspaceService.WORKSPACE_TOPIC, object : ElmWorkspaceService.ElmWorkspaceListener {
                 override fun didUpdate() {
-                    ApplicationManager.getApplication().invokeLater {
+                    ApplicationManager.getApplication().invokeLater({
                         elmProjects = project.elmWorkspace.allProjects
-                    }
+                    }, { project.isDisposed })
                 }
             })
         }
