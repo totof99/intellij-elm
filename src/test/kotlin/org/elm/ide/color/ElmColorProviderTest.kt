@@ -1,8 +1,7 @@
 package org.elm.ide.color
 
-import com.github.ajalt.colormath.ConvertibleColor
-import com.github.ajalt.colormath.HSL
-import com.github.ajalt.colormath.RGB
+import com.github.ajalt.colormath.model.HSL
+import com.github.ajalt.colormath.model.RGB
 import com.intellij.openapi.application.runWriteAction
 import com.intellij.util.ui.ColorIcon
 import org.elm.lang.ElmTestBase
@@ -56,22 +55,22 @@ main = ("border", "1px solid #aabbcc")
     fun `test write rgb(100%,0%,60%)`() = doCssWriteTest("rgb(100%,0%,60%)", "rgb(48%, 18%, 26%)")
     fun `test write rgb(100%, 0%, 60%)`() = doCssWriteTest("rgb(100%, 0%, 60%)", "rgb(48%, 18%, 26%)")
     fun `test write rgb(255 0 153)`() = doCssWriteTest("rgb(255 0 153)", "rgb(123 45 67)")
-    fun `test write #f090`() = doCssWriteTest("#f090", "#7b2d4300", RGB(123, 45, 67, 0f))
-    fun `test write #ff009900`() = doCssWriteTest("#ff00990", "#7b2d4300", RGB(123, 45, 67, 0f))
+    fun `test write #f090`() = doCssWriteTest("#f090", "#7b2d4300", RGB.from255(123, 45, 67, 0))
+    fun `test write #ff009900`() = doCssWriteTest("#ff00990", "#7b2d4300", RGB.from255(123, 45, 67, 0))
     fun `test write rgba(255, 0, 153, 1)`() = doCssWriteTest("rgba(255, 0, 153, 1)", "rgba(123, 45, 67)")
-    fun `test write rgb(255, 0, 153, 100%)`() = doCssWriteTest("rgb(255, 0, 153, 100%)", "rgb(123, 45, 67, 50%)", RGB(123, 45, 67, .5f))
-    fun `test write rgb(255 0 153 _ 1)`() = doCssWriteTest("rgb(255 0 153 / 1)", "rgb(123 45 67 / .2)", RGB(123, 45, 67, .2f))
-    fun `test write rgb(255 0 153 _ 100%)`() = doCssWriteTest("rgb(255 0 153 / 100%)", "rgb(123 45 67 / 50%)", RGB(123, 45, 67, .5f))
-    fun `test write hsl(270,60%,70%)`() = doCssWriteTest("hsl(270,60%,70%)", "hsl(123, 45%, 67%, .2)", HSL(123, 45, 67, .2f))
-    fun `test write hsl(270, 60%, 70%)`() = doCssWriteTest("hsl(270, 60%, 70%)", "hsl(123, 45%, 67%)", HSL(123, 45, 67))
-    fun `test write hsl(270 60% 70%)`() = doCssWriteTest("hsl(270 60% 70%)", "hsl(123 45% 67%)", HSL(123, 45, 67))
-    fun `test write hsl(270, 60%, 50%, _15)`() = doCssWriteTest("hsl(270, 60%, 50%, .15)", "hsl(123, 45%, 67%, .2)", HSL(123, 45, 67, .2f))
-    fun `test write hsl(270, 60%, 50%, 15%)`() = doCssWriteTest("hsl(270, 60%, 50%, 15%)", "hsl(123, 45%, 67%, 20%)", HSL(123, 45, 67, .2f))
-    fun `test write hsl(270 60% 50% _ _15)`() = doCssWriteTest("hsl(270 60% 50% / .15)", "hsl(123 45% 67% / .2)", HSL(123, 45, 67, .2f))
-    fun `test write hsl(270 60% 50% _ 15%)`() = doCssWriteTest("hsl(270 60% 50% / 15%)", "hsl(123 45% 67% / 20%)", HSL(123, 45, 67, .2f))
-    fun `test write hsl(270grad,60%,70%)`() = doCssWriteTest("hsl(270grad,60%,70%)", "hsl(136.6667grad, 45%, 67%, .2)", HSL(123, 45, 67, .2f))
-    fun `test write hsl(270rad,60%,70%)`() = doCssWriteTest("hsl(270rad,60%,70%)", "hsl(2.1468rad, 45%, 67%, .2)", HSL(123, 45, 67, .2f))
-    fun `test write hsl(270turn,60%,70%)`() = doCssWriteTest("hsl(270turn,60%,70%)", "hsl(.3417turn, 45%, 67%, .2)", HSL(123, 45, 67, .2f))
+    fun `test write rgb(255, 0, 153, 100%)`() = doCssWriteTest("rgb(255, 0, 153, 100%)", "rgb(123, 45, 67, 50%)", RGB.from255(123, 45, 67, 127))
+    fun `test write rgb(255 0 153 _ 1)`() = doCssWriteTest("rgb(255 0 153 / 1)", "rgb(123 45 67 / .2)", RGB.from255(123, 45, 67, 51))
+    fun `test write rgb(255 0 153 _ 100%)`() = doCssWriteTest("rgb(255 0 153 / 100%)", "rgb(123 45 67 / 50%)", RGB.from255(123, 45, 67, 127))
+    fun `test write hsl(270,60%,70%)`() = doCssWriteTest("hsl(270,60%,70%)", "hsl(123, 45%, 67%, .2)", HSL(123, 0.45, 0.67, .2f))
+    fun `test write hsl(270, 60%, 70%)`() = doCssWriteTest("hsl(270, 60%, 70%)", "hsl(123, 45%, 67%)", HSL(123, 0.45, 0.67))
+    fun `test write hsl(270 60% 70%)`() = doCssWriteTest("hsl(270 60% 70%)", "hsl(123 45% 67%)", HSL(123, 0.45, 0.67))
+    fun `test write hsl(270, 60%, 50%, _15)`() = doCssWriteTest("hsl(270, 60%, 50%, .15)", "hsl(123, 45%, 67%, .2)", HSL(123, 0.45, 0.67, .2f))
+    fun `test write hsl(270, 60%, 50%, 15%)`() = doCssWriteTest("hsl(270, 60%, 50%, 15%)", "hsl(123, 45%, 67%, 20%)", HSL(123, 0.45, 0.67, .2f))
+    fun `test write hsl(270 60% 50% _ _15)`() = doCssWriteTest("hsl(270 60% 50% / .15)", "hsl(123 45% 67% / .2)", HSL(123, 0.45, 0.67, .2f))
+    fun `test write hsl(270 60% 50% _ 15%)`() = doCssWriteTest("hsl(270 60% 50% / 15%)", "hsl(123 45% 67% / 20%)", HSL(123, 0.45, 0.67, .2f))
+    fun `test write hsl(270grad,60%,70%)`() = doCssWriteTest("hsl(270grad,60%,70%)", "hsl(136.6667grad, 45%, 67%, .2)", HSL(123, 0.45, 0.67, .2f))
+    fun `test write hsl(270rad,60%,70%)`() = doCssWriteTest("hsl(270rad,60%,70%)", "hsl(2.1468rad, 45%, 67%, .2)", HSL(123, 0.45, 0.67, .2f))
+    fun `test write hsl(270turn,60%,70%)`() = doCssWriteTest("hsl(270turn,60%,70%)", "hsl(.3417turn, 45%, 67%, .2)", HSL(123, 0.45, 0.67, .2f))
     //</editor-fold>
 
     //<editor-fold desc="functions">
@@ -170,12 +169,12 @@ main =
     fun `test write rgb 0 0 0`() = doFuncWriteTest("rgb", "0 0 0", "123 45 67")
 
     fun `test write rgb 255 255 255`() = doFuncWriteTest("rgb", "255 255 255", "123 45 67")
-    fun `test write rgb 0 0 0 with alpha`() = doFuncWriteTest("rgb", "0 0 0", "123 45 67", RGB(123, 45, 67, .5f))
+    fun `test write rgb 0 0 0 with alpha`() = doFuncWriteTest("rgb", "0 0 0", "123 45 67", RGB.from255(123, 45, 67, 127))
 
     fun `test write rgb255 0 0 0`() = doFuncWriteTest("rgb255", "0 0 0", "123 45 67")
 
     fun `test write rgba 0 0 0 0`() = doFuncWriteTest("rgba", "0 0 0 0", "123 45 67 1")
-    fun `test write rgba 255 255 255 1`() = doFuncWriteTest("rgba", "255 255 255 1", "123 45 67 0.2", RGB(123, 45, 67, .2f))
+    fun `test write rgba 255 255 255 1`() = doFuncWriteTest("rgba", "255 255 255 1", "123 45 67 0.2", RGB.from255(123, 45, 67, 51))
 
     fun `test write rgb float 1 1 1`() = doFuncWriteTest("rgb", "1 1 1", "0.4824 0.1765 0.2627")
     fun `test write rgb float 0_5 0_5 0_5`() = doFuncWriteTest("rgb", "0.5 0.5 05", "0.4824 0.1765 0.2627")
@@ -184,12 +183,12 @@ main =
     fun `test write rgba float`() = doFuncWriteTest("rgba", "0.5 0.5 05 0.5", "0.4824 0.1765 0.2627 1")
 
     fun `test write hsl 0 0 0`() = doFuncWriteTest("hsl", "0 0 0", "0 0 0", HSL(0, 0, 0))
-    fun `test write hsl 360 1 1`() = doFuncWriteTest("hsl", "360 1 1", "180 0.5 0.5", HSL(180, 50, 50))
+    fun `test write hsl 360 1 1`() = doFuncWriteTest("hsl", "360 1 1", "180 0.5 0.5", HSL(180, 0.5, 0.5))
 
     fun `test write hsla 0 0 0 0`() = doFuncWriteTest("hsla", "0 0 0 0", "0 0 0 1", HSL(0, 0, 0))
-    fun `test write hsla 360 1 1 1`() = doFuncWriteTest("hsla", "360 1 1 1", "180 0.5 0.5 0.2", HSL(180, 50, 50, .2f))
+    fun `test write hsla 360 1 1 1`() = doFuncWriteTest("hsla", "360 1 1 1", "180 0.5 0.5 0.2", HSL(180, 0.5, 0.5, .2f))
 
-    fun `test write rgb with linebreaks and comments`() = doWriteTest(RGB(123, 45, 67), """
+    fun `test write rgb with linebreaks and comments`() = doWriteTest(RGB.from255(123, 45, 67), """
 main = rgb{-caret-}
     -- red
     2 --
@@ -218,15 +217,15 @@ main = rgb
         assertEquals(expected, actual)
     }
 
-    private fun doCssWriteTest(before: String, after: String, color: ConvertibleColor = RGB(123, 45, 67)) {
+    private fun doCssWriteTest(before: String, after: String, color: com.github.ajalt.colormath.Color = RGB.from255(123, 45, 67)) {
         doWriteTest(color, "main = \". $before {-caret-}.\"", "main = \". $after .\"")
     }
 
-    private fun doFuncWriteTest(func: String, before: String, after: String, color: ConvertibleColor = RGB(123, 45, 67)) {
+    private fun doFuncWriteTest(func: String, before: String, after: String, color: com.github.ajalt.colormath.Color = RGB.from255(123, 45, 67)) {
         doWriteTest(color, "main = $func{-caret-} $before", "main = $func $after")
     }
 
-    private fun doWriteTest(color: ConvertibleColor, @Language("Elm") before: String, @Language("Elm") after: String) {
+    private fun doWriteTest(color: com.github.ajalt.colormath.Color, @Language("Elm") before: String, @Language("Elm") after: String) {
         InlineFile(before)
         val element = myFixture.file.findElementAt(myFixture.caretOffset - 1)
         requireNotNull(element)

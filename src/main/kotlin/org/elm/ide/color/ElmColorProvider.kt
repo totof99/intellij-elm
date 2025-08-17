@@ -1,6 +1,7 @@
 package org.elm.ide.color
 
 import com.github.ajalt.colormath.*
+import com.github.ajalt.colormath.model.*
 import com.intellij.ide.IdeBundle
 import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.editor.ElementColorProvider
@@ -32,28 +33,41 @@ class ElmColorProvider : ElementColorProvider {
     private fun getCssColorFromString(element: PsiElement): Color? {
         if (element.elementType != REGULAR_STRING_PART) return null
         return colorRegex.find(element.text)
-                ?.let { runCatching { com.github.ajalt.colormath.Color.fromCss(it.value) }.getOrNull() }
+                ?.let { runCatching { com.github.ajalt.colormath.Color.parse(it.value) }.getOrNull() }
                 ?.toAwtColor()
     }
 
     private fun getColorFromFuncCall(element: PsiElement): Color? {
         val call = getFuncCall(element) ?: return null
-        val color = runCatching {
-            // color constructors will throw if the args are out of bounds
-            when (call.name) {
+        // color constructors will throw if the args are out of bounds
+        val awtColor = runCatching {
+            val color = when (call.name) {
                 "rgb", "rgba" -> {
                     if (call.a == null && call.name == "rgba") return null
                     if (call.useFloat) RGB(call.c1, call.c2, call.c3, call.a ?: 1f)
-                    else RGB(call.c1.toInt(), call.c2.toInt(), call.c3.toInt(), call.a ?: 1f)
+                    else RGB.from255(call.c1.toInt(), call.c2.toInt(), call.c3.toInt(), call.a?.adaptAlphaTo255() ?: 255)
                 }
-                "rgb255" -> RGB(call.c1.toInt(), call.c2.toInt(), call.c3.toInt())
-                "rgba255" -> RGB(call.c1.toInt(), call.c2.toInt(), call.c3.toInt(), call.a ?: return null)
-                "hsl" -> HSL(call.c1, call.c2, call.c3)
-                "hsla" -> HSL(call.c1, call.c2, call.c3, call.a ?: return null)
+                "rgb255", "rgba255" -> {
+                    if (call.a == null && call.name == "rgba255") return null
+                    if (call.useFloat) RGB.from255(call.c1.toInt(), call.c2.toInt(), call.c3.toInt(), call.a?.adaptAlphaTo255() ?: 255)
+                    else RGB.from255(call.c1.toInt(), call.c2.toInt(), call.c3.toInt(), call.a?.adaptAlphaTo255() ?: 255)
+                }
+                "hsl", "hsla" -> {
+                    if (call.a == null && call.name == "hsla") return null
+                    else HSL(call.c1, call.c2, call.c3, call.a ?: 1f)
+                }
                 else -> return null
             }
+            return color.toAwtColor()
         }.getOrNull()
-        return color?.toAwtColor()
+        return awtColor
+    }
+
+    private fun Float.adaptAlphaTo255(): Int {
+        return if(this > 1f)
+            this.toInt()
+        else
+            (this*255f).toInt()
     }
 
     private fun getFuncCall(element: PsiElement): FuncCall? {
@@ -117,9 +131,9 @@ class ElmColorProvider : ElementColorProvider {
 
         if (call.name.startsWith("hsl")) {
             val hsl = color.toRGB().toHSL()
-            call.args[0].replace(factory.createNumberConstant(hsl.h.toFloat().render()))
-            call.args[1].replace(factory.createNumberConstant((hsl.s / 100f).render()))
-            call.args[2].replace(factory.createNumberConstant((hsl.l / 100f).render()))
+            call.args[0].replace(factory.createNumberConstant((if (hsl.h.isNaN()) 0f else hsl.h ).render()))
+            call.args[1].replace(factory.createNumberConstant(hsl.s.render()))
+            call.args[2].replace(factory.createNumberConstant(hsl.l.render()))
         } else {
             call.args[0].replace(color.red, call.useFloat)
             call.args[1].replace(color.green, call.useFloat)
@@ -191,11 +205,14 @@ private data class FuncCall(
         }
 }
 
-fun com.github.ajalt.colormath.Color.toAwtColor(): Color = toRGB().let {
-    Color(it.r, it.g, it.b, (it.a * 255).roundToInt())
+fun com.github.ajalt.colormath.Color.toAwtColor(): Color = toSRGB().let {
+    Color(it.r, it.g, it.b, it.alpha)
 }
 
-private fun Color.toRGB() = RGB(red, green, blue, alpha / 255f)
+private fun Color.toRGB() = let {
+    val (r, g, b, a) = it.getRGBComponents(null)
+    RGB(r, g, b, a)
+}
 
 private fun Float.render(): String = when (this) {
     0f -> "0"
@@ -220,14 +237,14 @@ fun com.github.ajalt.colormath.Color.toCssRgb(
         alphaPercent: Boolean = false,
         renderAlpha: RenderCondition = RenderCondition.AUTO
 ): String {
-    val (r, g, b, a) = toRGB()
+    val srgb = toSRGB()
     val sep = if (commas) ", " else " "
-    val args = listOf(r, g, b).joinToString(sep) {
+    val args = listOf(srgb.redInt, srgb.greenInt, srgb.blueInt).joinToString(sep) {
         when (rgbPercent) {
             true -> it.div(255f).renderCss(percent = true)
             false -> it.toString()
         }
-    }.withAlpha(a, commas, renderAlpha, alphaPercent)
+    }.withAlpha(srgb.alpha, commas, renderAlpha, alphaPercent)
     val name = if (namedRgba) "rgba" else "rgb"
     return "$name($args)"
 }
@@ -243,14 +260,14 @@ fun com.github.ajalt.colormath.Color.toCssHsl(
     val (h, s, l, a) = hsl
     val sep = if (commas) ", " else " "
     val hue = when (hueUnit) {
-        AngleUnit.AUTO -> "$h"
-        AngleUnit.DEGREES -> "${h}deg"
+        AngleUnit.AUTO -> h.renderCss()
+        AngleUnit.DEGREES -> "${h.renderCss()}deg"
         AngleUnit.RADIANS -> "${hsl.hueAsRad().renderCss()}rad"
         AngleUnit.GRADIANS -> "${hsl.hueAsGrad().renderCss()}grad"
         AngleUnit.TURNS -> "${hsl.hueAsTurns().renderCss()}turn"
     }
 
-    val args = listOf(hue, (s / 100f).renderCss(true), (l / 100f).renderCss(true)).joinToString(sep)
+    val args = listOf(hue, (s).renderCss(true), (l).renderCss(true)).joinToString(sep)
             .withAlpha(a, commas, renderAlpha, alphaPercent)
     val name = if (namedHsla) "hsla" else "hsl"
     return "$name($args)"
